@@ -73,7 +73,8 @@
             <div v-show="ifDisplayKeyboard"
                  id="displayKeyboard"
                  style="background-color:black; display: flex; justify-content: center; align-items: center;">
-                <div style="width: 50%; padding-left: 5%" v-for="currentKeyboard of 2">
+                <div :style="'width: 40%; ' + ((currentKeyboard === 1) ? 'padding-right: 5%' : 'padding-left: 5%')"
+                     v-for="currentKeyboard of 2">
                     <span v-for="(classValue, keyName) in keyboard"
                           class="keyboard"
                           v-if="(keyboardReg[currentKeyboard - 1].includes(keyName))">
@@ -82,6 +83,11 @@
                     <el-button v-else-if="classValue === 'na'" plain :class="classValue">@{{ 'NA' }}</el-button>
                     <el-button v-else plain :class="classValue">@{{ keyName }}</el-button>
                     </span>
+                </div>
+                <div style="position: fixed; color: white; padding-right: 5%">
+                    <span style="color: #67C23A">@{{ currentWordPass }}</span>
+                    <span :style="currentTypingStyle" id="targetChar">@{{ displayText[typingIndex] }}</span>
+                    <span style="color: #F2F6FC">@{{ currentWordNotYet }}</span>
                 </div>
             </div>
         </div>
@@ -122,6 +128,8 @@
             let ifDisplayKeyboard = localStorage.getItem('ifDisplayKeyboard');
 
             return {
+                currentWordPass: '',
+                currentWordNotYet: '',
                 prevText: '',
                 ifDisplayKeyboard: (null === ifDisplayKeyboard) ? true : ifDisplayKeyboard,
                 typeResult: null,
@@ -176,6 +184,8 @@
             window.addEventListener("keypress", e => {
                 this.focusInput();
             });
+
+            this.modifyCurrentWord();
         },
         methods: {
             handleCopyTextChanged(value) {
@@ -274,6 +284,27 @@
                     });
                 }
             },
+            modifyCurrentWord() {
+                let startIndex = this.typingIndex;
+                let lastIndex = this.typingIndex;
+                while ((lastIndex < this.displayText.length) &&
+                    (this.displayText[lastIndex].match(/^[A-Za-z]+$/))) {
+                    lastIndex++;
+                }
+
+                while ((startIndex > 0) &&
+                    (this.displayText[startIndex].match(/^[A-Za-z]+$/))) {
+                    startIndex--;
+                }
+
+                this.currentWordPass = this.displayText.slice(startIndex, this.typingIndex);
+                this.currentWordNotYet = this.displayText.slice(this.typingIndex + 1, lastIndex);
+            },
         },
+        watch: {
+            typingIndex() {
+                this.modifyCurrentWord();
+            }
+        }
     });
 </script>
