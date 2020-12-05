@@ -31,7 +31,13 @@
             </div>
         </div>
         <div style="margin: 10px">
-            <el-input v-model="typingText" id="typingText" ref="typingText" @input="handleTypingTextChanged"></el-input>
+            <el-input v-model="typingText"
+                      id="typingText"
+                      ref="typingText"
+                      @input="handleTypingTextChanged"
+                      @keyup.backspace.native="handleBackSpace"
+                      @keydown.native="handleKeyPress"
+            ></el-input>
         </div>
         <span>複製文章</span>
         <el-button type="danger" plain @click="resetType">Reset</el-button>
@@ -108,7 +114,22 @@
                 this.typeResult = null;
                 this.typingIndex = 0;
                 this.focusInput();
-            }
+            },
+            handleBackSpace() {
+                if (this.typingIndex) {
+                    this.typingIndex--;
+                    this.typeResult = 'backspace';
+                }
+            },
+            handleKeyPress(value) {
+                switch(value.key) {
+                    case 'ArrowDown':
+                        while((this.typingIndex < this.displayText.length) &&
+                            (!this.displayText[++this.typingIndex].match(/\n/g)));
+                        this.typeResult = 'jump line';
+                        break;
+                }
+            },
         },
     });
 </script>
