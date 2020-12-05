@@ -84,7 +84,7 @@
                     <el-button v-else plain :class="classValue">@{{ keyName }}</el-button>
                     </span>
                 </div>
-                <div style="position: fixed; color: white; padding-right: 5%">
+                <div v-if="(displayText) && (displayText.length > 0)" style="position: fixed; color: white; padding-right: 5%">
                     <span style="color: #67C23A">@{{ currentWordPass }}</span>
                     <span :style="currentTypingStyle" id="targetChar">@{{ displayText[typingIndex] }}</span>
                     <span style="color: #F2F6FC">@{{ currentWordNotYet }}</span>
@@ -278,8 +278,9 @@
             scrollToTarget() {
                 let target = document.getElementById('targetChar');
                 if (target) {
+                    let offset = 150;
                     window.scrollTo({
-                        top: target.getBoundingClientRect().top,
+                        top: window.scrollY + target.getBoundingClientRect().top - offset,
                         behavior: 'smooth'
                     });
                 }
