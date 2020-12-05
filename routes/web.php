@@ -19,5 +19,5 @@ Route::get('/', function () {
 
 
 Route::group(['prefix' => 'typing'], function () {
-    Route::get('/', 'Admin\Typing@index');
+    Route::get('/', 'TypingController@index');
 });
