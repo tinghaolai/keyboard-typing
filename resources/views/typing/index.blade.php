@@ -10,6 +10,34 @@
         width: 100%;
         z-index: 1000;
     }
+
+    .el-button.na {
+        background-color: #C0C4CC;
+        color: #E4E7ED;
+    }
+
+    .keyboard button {
+        width: 30px;
+        margin: 5px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .press {
+        background-color: #409EFF;
+        color: #F2F6FC;
+    }
+
+    .wrong {
+        background-color: #F56C6C;
+        color: #F2F6FC;
+    }
+
+    .target {
+        background-color: #E6A23C;
+        color: #F2F6FC;
+    }
 </style>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -20,14 +48,26 @@
 </head>
 <body>
     <div id="app">
-        <div v-if="(displayText) && (displayText.length > 0)">
-            Typing area
-            <div v-if="typingIndex < displayText.length">現在要打的字 @{{ displayText[typingIndex] }} <span v-show="typeResult">, @{{ typeResult }}</span></div>
-            <div v-else>結束</div>
-            <div style="background-color: #303133;margin: 10px; white-space: pre-line">
-                <span style="color: #67C23A">@{{ displayText.slice(0, typingIndex) }}</span>
-                <span :style="currentTypingStyle" id="targetChar">@{{ displayText[typingIndex] }}</span>
-                <span style="color: #F2F6FC">@{{ displayText.slice(typingIndex+1, displayText.length) }}</span>
+        <div style="display: flex">
+            <div v-if="(displayText) && (displayText.length > 0)" style="width: 70%">
+                Typing area
+                <div v-if="typingIndex < displayText.length">現在要打的字 @{{ displayText[typingIndex] }} <span v-show="typeResult">, @{{ typeResult }}</span></div>
+                <div v-else>結束</div>
+                <div style="background-color: #303133;margin: 10px; white-space: pre-line">
+                    <span style="color: #67C23A">@{{ displayText.slice(0, typingIndex) }}</span>
+                    <span :style="currentTypingStyle" id="targetChar">@{{ displayText[typingIndex] }}</span>
+                    <span style="color: #F2F6FC">@{{ displayText.slice(typingIndex+1, displayText.length) }}</span>
+                </div>
+            </div>
+            <div v-else style="width: 70%">
+                No Article
+            </div>
+            <div  style="width: 30%">
+                <span v-for="(classValue, keyName) in keyboard" class="keyboard">
+                    <br v-if="classValue === 'lineBreak'">
+                    <el-button v-else-if="classValue === 'na'" plain :class="classValue">@{{ 'NA' }}</el-button>
+                    <el-button v-else plain :class="classValue">@{{ keyName }}</el-button>
+                </span>
             </div>
         </div>
         <div style="margin: 10px">
@@ -51,7 +91,6 @@
 </body>
 </html>
 
-
 <script src="//cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
 <script src="https://cdn.bootcss.com/element-ui/2.12.0/index.js"></script>
@@ -64,14 +103,59 @@
         el: '#app',
         data() {
             let lastCopy = localStorage.getItem('copyText');
+            let ifDisplayKeyboard = localStorage.getItem('ifDisplayKeyboard');
 
             return {
+                prevText: '',
+                ifDisplayKeyboard: (null === ifDisplayKeyboard) ? true : ifDisplayKeyboard,
                 typeResult: null,
                 typingText: '',
                 copyText: lastCopy,
                 displayText: lastCopy,
                 typingIndex: 0,
                 currentTypingStyle: 'color: #E6A23C',
+                keyboard: {
+                    'NA1': 'na',
+                    'NA2': 'na',
+                    'NA3': 'na',
+                    'P': '',
+                    'Y': '',
+                    'lineBreak1': 'lineBreak',
+                    'A': '',
+                    'O': '',
+                    'E': '',
+                    'U': '',
+                    'I': '',
+                    'lineBreak2': 'lineBreak',
+                    'NA4': 'na',
+                    'Q': '',
+                    'J': '',
+                    'K': '',
+                    'X': '',
+                    'lineBreak3': 'lineBreak',
+                    'lineBreak4': 'lineBreak',
+                    'lineBreak5': 'lineBreak',
+                    'F': '',
+                    'G': '',
+                    'C': '',
+                    'R': '',
+                    'L': '',
+                    'lineBreak6': 'lineBreak',
+                    'D': '',
+                    'H': '',
+                    'T': '',
+                    'N': '',
+                    'S': '',
+                    'lineBreak7': 'lineBreak',
+                    'B': '',
+                    'M': '',
+                    'W': '',
+                    'V': '',
+                    'Z': '',
+                    'lineBreak8': 'lineBreak',
+                    'lineBreak9': 'lineBreak',
+                    'lineBreak10': 'lineBreak',
+                },
             }
         },
         mounted() {
@@ -87,6 +171,7 @@
             },
             handleTypingTextChanged(value) {
                 value = value.slice(value.length - 1);
+                let upperCase = value.toUpperCase();
                 if (this.displayText.length > 0) {
                     if (this.typingIndex > this.displayText.length) {
                         this.typeResult ='無法再輸入更多';
@@ -104,10 +189,16 @@
                             }
                         } while (!this.displayText[this.typingIndex].match(/^[A-Za-z]+$/));
                     } else {
+                        this.keyboard[this.displayText[this.typingIndex].toUpperCase()] = 'target';
+                        this.keyboard[this.prevText] = 'wrong';
                         this.typeResult = '錯誤，你輸入: ' + value;
                         this.currentTypingStyle = 'color: #F56C6C';
                     }
                 }
+
+                this.keyboard[this.prevText] = '';
+                this.prevText = upperCase;
+                this.keyboard[this.prevText] = 'press';
             },
             focusInput() {
                 this.$refs.typingText.focus();
