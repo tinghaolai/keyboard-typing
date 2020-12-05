@@ -38,12 +38,12 @@
     }
 
     .wrong {
-        background-color: #F56C6C;
+        background-color: #E6A23C;
         color: #F2F6FC;
     }
 
     .target {
-        background-color: #E6A23C;
+        background-color: #F56C6C;
         color: #F2F6FC;
     }
 </style>
@@ -90,6 +90,7 @@
                       id="typingText"
                       ref="typingText"
                       @input="handleTypingTextChanged"
+                      @keyup.native="handleTypingKeyup"
                       @keyup.backspace.native="handleBackSpace"
                       @keydown.native="handleKeyPress"
             ></el-input>
@@ -182,9 +183,15 @@
                 this.focusInput();
                 localStorage.setItem('copyText', value);
             },
+            handleTypingKeyup(value) {
+                this.keyboard[value.key.toUpperCase()] = '';
+            },
             handleTypingTextChanged(value) {
                 value = value.slice(value.length - 1);
                 let upperCase = value.toUpperCase();
+                this.keyboard[this.prevText] = '';
+                this.prevText = upperCase;
+                this.keyboard[this.prevText] = 'press';
                 if (this.displayText.length > 0) {
                     if (this.typingIndex > this.displayText.length) {
                         this.typeResult ='無法再輸入更多';
@@ -208,10 +215,6 @@
                         this.currentTypingStyle = 'color: #F56C6C';
                     }
                 }
-
-                this.keyboard[this.prevText] = '';
-                this.prevText = upperCase;
-                this.keyboard[this.prevText] = 'press';
             },
             focusInput() {
                 this.$refs.typingText.focus();
