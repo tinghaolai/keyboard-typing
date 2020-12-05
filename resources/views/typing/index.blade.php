@@ -11,13 +11,21 @@
         z-index: 1000;
     }
 
+    #displayKeyboard {
+        position: fixed;
+        bottom: 0px;
+        padding-bottom: 50px;
+        width: 100%;
+        z-index: 1000;
+    }
+
     .el-button.na {
         background-color: #C0C4CC;
         color: #E4E7ED;
     }
 
     .keyboard button {
-        width: 30px;
+        width: 80px;
         margin: 5px;
         display: inline-flex;
         justify-content: center;
@@ -48,8 +56,8 @@
 </head>
 <body>
     <div id="app">
-        <div style="display: flex">
-            <div v-if="(displayText) && (displayText.length > 0)" style="width: 70%">
+        <div>
+            <div v-if="(displayText) && (displayText.length > 0)">
                 Typing area
                 <div v-if="typingIndex < displayText.length">現在要打的字 @{{ displayText[typingIndex] }} <span v-show="typeResult">, @{{ typeResult }}</span></div>
                 <div v-else>結束</div>
@@ -59,15 +67,22 @@
                     <span style="color: #F2F6FC">@{{ displayText.slice(typingIndex+1, displayText.length) }}</span>
                 </div>
             </div>
-            <div v-else style="width: 70%">
+            <div v-else>
                 No Article
             </div>
-            <div  style="width: 30%">
-                <span v-for="(classValue, keyName) in keyboard" class="keyboard">
+            <div v-show="ifDisplayKeyboard"
+                 id="displayKeyboard"
+                 style="background-color:black; display: flex; justify-content: center; align-items: center;">
+                <div style="width: 50%; padding-left: 5%" v-for="currentKeyboard of 2">
+                    <span v-for="(classValue, keyName) in keyboard"
+                          class="keyboard"
+                          v-if="(keyboardReg[currentKeyboard - 1].includes(keyName))">
                     <br v-if="classValue === 'lineBreak'">
+                    <div v-else-if="classValue === 'nextKeyboard'"></div>
                     <el-button v-else-if="classValue === 'na'" plain :class="classValue">@{{ 'NA' }}</el-button>
                     <el-button v-else plain :class="classValue">@{{ keyName }}</el-button>
-                </span>
+                    </span>
+                </div>
             </div>
         </div>
         <div style="margin: 10px">
@@ -132,9 +147,6 @@
                     'J': '',
                     'K': '',
                     'X': '',
-                    'lineBreak3': 'lineBreak',
-                    'lineBreak4': 'lineBreak',
-                    'lineBreak5': 'lineBreak',
                     'F': '',
                     'G': '',
                     'C': '',
@@ -152,10 +164,11 @@
                     'W': '',
                     'V': '',
                     'Z': '',
-                    'lineBreak8': 'lineBreak',
-                    'lineBreak9': 'lineBreak',
-                    'lineBreak10': 'lineBreak',
                 },
+                keyboardReg: [
+                    ['P', 'Y', 'A', 'O', 'E', 'U', 'I', 'Q', 'J', 'K', 'X', 'NA1', 'NA2', 'NA3', 'NA4', 'lineBreak1', 'lineBreak2'],
+                    ['F', 'G', 'C', 'R', 'L', 'D', 'H', 'T', 'N', 'S', 'B', 'M', 'W', 'V', 'Z', 'lineBreak6', 'lineBreak7']
+                ],
             }
         },
         mounted() {
