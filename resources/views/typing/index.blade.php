@@ -63,11 +63,13 @@
     new Vue({
         el: '#app',
         data() {
+            let lastCopy = localStorage.getItem('copyText');
+
             return {
                 typeResult: null,
                 typingText: '',
-                copyText: '',
-                displayText: '',
+                copyText: lastCopy,
+                displayText: lastCopy,
                 typingIndex: 0,
                 currentTypingStyle: 'color: #E6A23C',
             }
@@ -81,6 +83,7 @@
             handleCopyTextChanged(value) {
                 this.displayText = value;
                 this.focusInput();
+                localStorage.setItem('copyText', value);
             },
             handleTypingTextChanged(value) {
                 value = value.slice(value.length - 1);
