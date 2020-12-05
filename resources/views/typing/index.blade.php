@@ -127,10 +127,44 @@
             handleKeyPress(value) {
                 switch(value.key) {
                     case 'ArrowDown':
-                        while((this.typingIndex < this.displayText.length) &&
-                            (!this.displayText[++this.typingIndex].match(/\n/g)));
                         this.typeResult = 'jump line';
+                        while((this.typingIndex < this.displayText.length) &&
+                            (!this.displayText[++this.typingIndex].match(/\n/g))) {}
+
+                        while (!this.displayText[this.typingIndex].match(/^[A-Za-z]+$/)) {
+                            this.typingIndex++;
+                        }
+
+                        this.scrollToTarget();
                         break;
+                    case 'ArrowUp':
+                        this.typeResult = 'jump line back';
+                        while((this.typingIndex !== 0) &&
+                        (!this.displayText[--this.typingIndex].match(/\n/g))) {}
+
+                        while (!this.displayText[this.typingIndex].match(/^[A-Za-z]+$/)) {
+                            this.typingIndex--;
+                        }
+
+                        while((this.typingIndex !== 0) &&
+                        (!this.displayText[--this.typingIndex].match(/\n/g))) {}
+
+                        while (!this.displayText[this.typingIndex].match(/^[A-Za-z]+$/)) {
+                            this.typingIndex++;
+                        }
+
+
+                        this.scrollToTarget();
+                        break;
+                }
+            },
+            scrollToTarget() {
+                let target = document.getElementById('targetChar');
+                if (target) {
+                    window.scrollTo({
+                        top: target.getBoundingClientRect().top,
+                        behavior: 'smooth'
+                    });
                 }
             },
         },
